@@ -1,0 +1,61 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-email
+  labels:
+    app: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mail
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      containers:
+      - name: ae
+        image: docker.io/tz2182/ae:latest
+        ports:
+        - containerPort: 9090
+      - name: be
+        image: docker.io/tz2182/be:latest
+        ports:
+        - containerPort: 53533
+      - name: au
+        image: docker.io/tz2182/au:latest
+        ports:
+        - containerPort: 5000
+      - name: bu
+        image: docker.io/tz2182/bu:latest
+        ports:
+        - containerPort: 6060
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mail-service
+spec:
+  type: NodePort
+  ports:
+    - name: ae
+      port: 9090
+      targetPort: 9090
+      nodePort: 30000
+    - name: be
+      port: 53533
+      targetPort: 53533
+      nodePort: 31000
+    - name: au
+      port: 5000
+      targetPort: 5000
+      nodePort: 31500
+    - name: bu
+      port: 6060
+      targetPort: 6060
+      nodePort: 32000
+  selector:
+    app: mail
+
